@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدیریت گیم نت پیشرفته</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="/ilia/manifest.json">
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            gap: 30px;
+        }
+
+        h1 {
+            color: #00bcd4; /* Neon Blue */
+            text-shadow: 0 0 15px rgba(0, 188, 212, 0.7);
+            font-size: 2.8em;
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .summary-panel {
+            background-color: #2c394b;
+            border-radius: 15px;
+            padding: 20px 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 2px solid #ff5722;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-item h3 {
+            color: #ffe082;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .summary-item p {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #00e676;
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.6);
+        }
+
+        .end-day-button {
+            background-color: #e91e63;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.4);
+        }
+
+        .end-day-button:hover {
+            background-color: #c2185b;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.6);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        .station-card {
+            background-color: #2c394b;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 2px solid #00bcd4;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .station-card::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, rgba(0, 188, 212, 0.2), rgba(255, 0, 255, 0.1));
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .station-card:hover::before {
+            opacity: 1;
+        }
+        .station-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        .station-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            z-index: 1;
+        }
+
+        .station-header h2 {
+            margin: 0;
+            color: #ff5722; /* Neon Orange */
+            font-size: 1.8em;
+            text-shadow: 0 0 10px rgba(255, 87, 34, 0.7);
+        }
+
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background-color: #f44336; /* Red for offline */
+            box-shadow: 0 0 8px rgba(244, 67, 54, 0.7);
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .status-indicator.online {
+            background-color: #4caf50; /* Green for online */
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.7);
+        }
+
+        .time-info {
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .time-info div {
+            font-size: 1.2em;
+            color: #ccc;
+        }
+
+        .time-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #e91e63; /* Neon Pink */
+            text-shadow: 0 0 12px rgba(233, 30, 99, 0.8);
+            margin-top: 5px;
+        }
+
+        .total-cost {
+            font-size: 1.6em;
+            color: #00e676; /* Neon Green */
+            text-align: center;
+            margin-top: 15px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px dashed #00e676;
+            z-index: 1;
+        }
+
+        .controls button {
+            background-color: #00bcd4;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+        }
+
+        .controls button:hover {
+            background-color: #00e5ff;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.6);
+        }
+        .controls button:active {
+            transform: translateY(0);
+        }
+
+        .controls button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            gap: 10px;
+            flex-wrap: wrap;
+            z-index: 1;
+        }
+
+        .bistro-section {
+            background-color: #3a475a;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .bistro-section h3 {
+            color: #ffe082; /* Light Orange/Yellow */
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+
+        .bistro-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .bistro-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #4b5a6c;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #5a6b80;
+        }
+
+        .bistro-item span {
+            font-size: 1.1em;
+            color: #e0e0e0;
+        }
+
+        .bistro-item button {
+            background-color: #ff5722;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 10px rgba(255, 87, 34, 0.4);
+        }
+
+        .bistro-item button:hover {
+            background-color: #e64a19;
+        }
+
+        .bistro-summary {
+            margin-top: 15px;
+            border-top: 1px dashed #666;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #ffa000; /* Amber */
+        }
+
+        /* Modal Styles - Shared for Bistro and Alerts */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 100; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInOverlay 0.3s forwards;
+        }
+
+        @keyframes fadeInOverlay {
+            from { background-color: rgba(0,0,0,0); }
+            to { background-color: rgba(0,0,0,0.8); }
+        }
+
+        .modal-content {
+            background-color: #2c394b;
+            margin: auto;
+            padding: 30px;
+            border: 2px solid #00bcd4;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            position: relative;
+            animation: fadeInModal 0.3s ease-out;
+            display: flex; /* For centering content */
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+            /* Ensure modals are on top of other modals */
+            z-index: 101; /* Higher than .modal z-index */
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: #ff5722;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-content h2 {
+            color: #00bcd4;
+            margin-top: 0;
+            margin-bottom: 15px; /* Adjust margin for overall modal gap */
+            text-align: center;
+            font-size: 1.8em;
+        }
+
+        .modal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 10px; /* Gap between items */
+            background-color: #3a475a;
+            border-radius: 8px;
+            border: 1px solid #5a6b80;
+            width: 100%; /* Make items fill modal width */
+        }
+
+        .modal-item:last-child {
+            margin-bottom: 0; /* No margin for last item */
+        }
+
+        .modal-item span {
+            font-size: 1.1em;
+            color: #e0e0e0;
+        }
+
+        .modal-item button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-item button:hover {
+            background-color: #45a049;
+        }
+
+        /* Alert Modal Specific Styles */
+        #alertModal .modal-content {
+            border-color: #ff5722; /* Different border color for alerts */
+            text-align: center;
+            z-index: 102; /* Even higher for alert modal */
+        }
+
+        #alertModal h2 {
+            color: #ff5722;
+        }
+
+        #alertModal p {
+            font-size: 1.3em;
+            color: #e0e0e0;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        #alertModal .alert-buttons button {
+            background-color: #00bcd4;
+            color: #1a1a2e;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 10px;
+        }
+
+        #alertModal .alert-buttons button.confirm {
+            background-color: #4CAF50;
+        }
+        #alertModal .alert-buttons button.confirm:hover {
+            background-color: #45a049;
+        }
+
+        #alertModal .alert-buttons button.cancel {
+            background-color: #f44336;
+        }
+        #alertModal .alert-buttons button.cancel:hover {
+            background-color: #d32f2f;
+        }
+
+        /* End of Day Details Modal Styles (New) */
+        #endDayDetailsModal .modal-content {
+            border-color: #ffa000; /* Amber for End of Day Details */
+            max-width: 600px; /* Wider for list of days */
+        }
+
+        #endDayDetailsModal h2 {
+            color: #ffa000;
+        }
+
+        #endDayDetailsModal .revenue-list {
+            width: 100%;
+            max-height: 400px; /* Scrollable list */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-right: 10px; /* For scrollbar */
+        }
+
+        #endDayDetailsModal .day-entry {
+            background-color: #3a475a;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #5a6b80;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative; /* For delete button positioning */
+        }
+
+        #endDayDetailsModal .day-entry h3 {
+            margin: 0;
+            color: #00e676;
+            font-size: 1.3em;
+            border-bottom: 1px dashed #666;
+            padding-bottom: 5px;
+            margin-bottom: 5px;
+            display: flex; /* To align date and delete button */
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #endDayDetailsModal .day-entry .delete-day-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #endDayDetailsModal .day-entry .delete-day-button:hover {
+            background-color: #d32f2f;
+        }
+
+        #endDayDetailsModal .day-entry p {
+            margin: 0;
+            font-size: 1em;
+            color: #e0e0e0;
+        }
+
+        #endDayDetailsModal .day-entry .total {
+            font-weight: bold;
+            color: #00bcd4;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        #endDayDetailsModal .action-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        #endDayDetailsModal .action-buttons button {
+            background-color: #e91e63;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #endDayDetailsModal .action-buttons button:hover {
+            background-color: #c2185b;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>🎮 پنل مدیریت گیم نت 🎮</h1>
+
+    <div class="summary-panel">
+        <div class="summary-item">
+            <h3>درآمد امروز</h3>
+            <p id="dailyRevenue">0 تومان</p>
+        </div>
+        <button class="end-day-button" onclick="showEndDayDetails()">پایان روز کاری</button>
+    </div>
+
+    <div class="dashboard">
+        <div class="station-card" id="station1">
+            <div class="station-header">
+                <h2>ایستگاه 1</h2>
+                <div class="status-indicator" data-station-id="1"></div>
+            </div>
+            <div class="time-info">
+                <div>مدت زمان: <span class="time-display" id="timeDisplay1">00:00:00</span></div>
+                <div>شروع: <span id="startTime1">--:--</span></div>
+                <div>پایان: <span id="endTime1">--:--</span></div>
+            </div>
+            <div class="total-cost" id="totalCost1">هزینه کل: 0 تومان</div>
+            <div class="controls">
+                <button onclick="startTimer(1)">شروع</button>
+                <button onclick="pauseTimer(1)">توقف</button>
+                <button onclick="addBistroItemPrompt(1)">افزودن بوفه</button>
+                <button onclick="checkoutStation(1)">تسویه حساب</button>
+            </div>
+            <div class="bistro-section">
+                <h3>بوفه ایستگاه</h3>
+                <div class="bistro-items" id="bistroItems1">
+                    </div>
+                <div class="bistro-summary" id="bistroSummary1">
+                    <span>مجموع بوفه:</span>
+                    <span id="bistroTotal1">0 تومان</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="station-card" id="station2">
+            <div class="station-header">
+                <h2>ایستگاه 2</h2>
+                <div class="status-indicator" data-station-id="2"></div>
+            </div>
+            <div class="time-info">
+                <div>مدت زمان: <span class="time-display" id="timeDisplay2">00:00:00</span></div>
+                <div>شروع: <span id="startTime2">--:--</span></div>
+                <div>پایان: <span id="endTime2">--:--</span></div>
+            </div>
+            <div class="total-cost" id="totalCost2">هزینه کل: 0 تومان</div>
+            <div class="controls">
+                <button onclick="startTimer(2)">شروع</button>
+                <button onclick="pauseTimer(2)">توقف</button>
+                <button onclick="addBistroItemPrompt(2)">افزودن بوفه</button>
+                <button onclick="checkoutStation(2)">تسویه حساب</button>
+            </div>
+            <div class="bistro-section">
+                <h3>بوفه ایستگاه</h3>
+                <div class="bistro-items" id="bistroItems2"></div>
+                <div class="bistro-summary" id="bistroSummary2">
+                    <span>مجموع بوفه:</span>
+                    <span id="bistroTotal2">0 تومان</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="station-card" id="station3">
+            <div class="station-header">
+                <h2>ایستگاه 3</h2>
+                <div class="status-indicator" data-station-id="3"></div>
+            </div>
+            <div class="time-info">
+                <div>مدت زمان: <span class="time-display" id="timeDisplay3">00:00:00</span></div>
+                <div>شروع: <span id="startTime3">--:--</span></div>
+                <div>پایان: <span id="endTime3">--:--</span></div>
+            </div>
+            <div class="total-cost" id="totalCost3">هزینه کل: 0 تومان</div>
+            <div class="controls">
+                <button onclick="startTimer(3)">شروع</button>
+                <button onclick="pauseTimer(3)">توقف</button>
+                <button onclick="addBistroItemPrompt(3)">افزودن بوفه</button>
+                <button onclick="checkoutStation(3)">تسویه حساب</button>
+            </div>
+            <div class="bistro-section">
+                <h3>بوفه ایستگاه</h3>
+                <div class="bistro-items" id="bistroItems3"></div>
+                <div class="bistro-summary" id="bistroSummary3">
+                    <span>مجموع بوفه:</span>
+                    <span id="bistroTotal3">0 تومان</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="station-card" id="station4">
+            <div class="station-header">
+                <h2>ایستگاه 4</h2>
+                <div class="status-indicator" data-station-id="4"></div>
+            </div>
+            <div class="time-info">
+                <div>مدت زمان: <span class="time-display" id="timeDisplay4">00:00:00</span></div>
+                <div>شروع: <span id="startTime4">--:--</span></div>
+                <div>پایان: <span id="endTime4">--:--</span></div>
+            </div>
+            <div class="total-cost" id="totalCost4">هزینه کل: 0 تومان</div>
+            <div class="controls">
+                <button onclick="startTimer(4)">شروع</button>
+                <button onclick="pauseTimer(4)">توقف</button>
+                <button onclick="addBistroItemPrompt(4)">افزودن بوفه</button>
+                <button onclick="checkoutStation(4)">تسویه حساب</button>
+            </div>
+            <div class="bistro-section">
+                <h3>بوفه ایستگاه</h3>
+                <div class="bistro-items" id="bistroItems4"></div>
+                <div class="bistro-summary" id="bistroSummary4">
+                    <span>مجموع بوفه:</span>
+                    <span id="bistroTotal4">0 تومان</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="station-card" id="station5">
+            <div class="station-header">
+                <h2>ایستگاه 5</h2>
+                <div class="status-indicator" data-station-id="5"></div>
+            </div>
+            <div class="time-info">
+                <div>مدت زمان: <span class="time-display" id="timeDisplay5">00:00:00</span></div>
+                <div>شروع: <span id="startTime5">--:--</span></div>
+                <div>پایان: <span id="endTime5">--:--</span></div>
+            </div>
+            <div class="total-cost" id="totalCost5">هزینه کل: 0 تومان</div>
+            <div class="controls">
+                <button onclick="startTimer(5)">شروع</button>
+                <button onclick="pauseTimer(5)">توقف</button>
+                <button onclick="addBistroItemPrompt(5)">افزودن بوفه</button>
+                <button onclick="checkoutStation(5)">تسویه حساب</button>
+            </div>
+            <div class="bistro-section">
+                <h3>بوفه ایستگاه</h3>
+                <div class="bistro-items" id="bistroItems5"></div>
+                <div class="bistro-summary" id="bistroSummary5">
+                    <span>مجموع بوفه:</span>
+                    <span id="bistroTotal5">0 تومان</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bistroModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeBistroModal()">&times;</span>
+            <h2>انتخاب آیتم بوفه</h2>
+            <div id="modalBistroItems">
+                </div>
+        </div>
+    </div>
+
+    <div id="alertModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeAlertModal()">&times;</span>
+            <h2 id="alertTitle"></h2>
+            <p id="alertMessage"></p>
+            <div class="alert-buttons">
+                <button id="alertConfirmBtn" class="confirm" style="display:none;">تایید</button>
+                <button id="alertCancelBtn" class="cancel" style="display:none;">لغو</button>
+                <button id="alertOKBtn" style="display:none;">باشه</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="endDayDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeEndDayDetailsModal()">&times;</span>
+            <h2>پایان روز کاری و گزارشات</h2>
+            <div class="revenue-list" id="pastDaysRevenueList">
+                </div>
+            <div class="action-buttons">
+                <button onclick="confirmEndWorkDay()">پایان روز کاری فعلی و ثبت</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PWA: Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/ilia/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
+        // تنظیمات نرخ بازی (هر دقیقه) و آیتم های بوفه
+        const HOURLY_RATE = 100000; // 100,000 تومان برای هر ساعت
+        const MINUTE_RATE = HOURLY_RATE / 60; // نرخ دقیقه ای
+
+        const BISTRO_ITEMS = [
+            { id: 1, name: 'نوشابه', price: 8000 },
+            { id: 2, name: 'آب معدنی', price: 5000 },
+            { id: 3, name: 'چیپس', price: 15000 },
+            { id: 4, name: 'شکلات', price: 10000 },
+            { id: 5, name: 'قهوه', price: 20000 },
+            { id: 6, name: 'پاپ کورن', price: 12000 },
+            { id: 7, name: 'بیسکویت', price: 7000 }
+        ];
+
+        let timers = {}; // ذخیره وضعیت تایمرها برای هر ایستگاه
+        let currentDailyRevenue = 0; // درآمد امروز
+        let dailyBistroRevenue = 0; // درآمد بوفه امروز
+        let dailyGameRevenue = 0; // درآمد بازی امروز
+        let pastWorkDays = []; // آرایه برای ذخیره جزئیات روزهای گذشته
+
+        // برای مدیریت Promise های مودال هشدار
+        let resolveAlertPromise;
+
+        // تابع برای فرمت کردن عدد به تومان
+        function formatCurrency(amount) {
+            if (typeof amount !== 'number' || isNaN(amount)) {
+                amount = 0;
+            }
+            return new Intl.NumberFormat('fa-IR', { style: 'decimal' }).format(Math.round(amount)) + ' تومان';
+        }
+
+        // تابع برای فرمت کردن زمان (HH:MM)
+        function formatTime(date) {
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // تابع برای فرمت کردن تاریخ به شمسی و اضافه کردن نام روز هفته
+        function formatPersianDate(date) {
+            const options = {
+                weekday: 'long', // Full name of the weekday
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+            };
+            // 'fa-IR' uses Persian (Jalali) calendar by default in most modern browsers.
+            return new Intl.DateTimeFormat('fa-IR', options).format(date);
+        }
+
+        // تابع شروع تایمر
+        function startTimer(stationId) {
+            if (!timers[stationId]) {
+                timers[stationId] = {
+                    startTime: 0,
+                    elapsedTime: 0,
+                    interval: null,
+                    running: false,
+                    bistroItems: [],
+                    startClockTime: null,
+                    endClockTime: null,
+                    currentTotalCost: 0,
+                    currentGameCost: 0,
+                    currentBistroCost: 0
+                };
+            }
+
+            const station = timers[stationId];
+            const statusIndicator = document.querySelector(`#station${stationId} .status-indicator`);
+            statusIndicator.classList.add('online');
+
+            if (!station.running) {
+                if (station.elapsedTime === 0) {
+                    station.startClockTime = new Date();
+                    document.getElementById(`startTime${stationId}`).innerText = formatTime(station.startClockTime);
+                    // Reset startTime to current time only if starting from 0
+                    station.startTime = Date.now();
+                } else {
+                    // If resuming, adjust startTime to account for elapsed time
+                    station.startTime = Date.now() - station.elapsedTime;
+                }
+                station.interval = setInterval(() => updateTimer(stationId), 1000);
+                station.running = true;
+            }
+        }
+
+        // تابع توقف تایمر
+        function pauseTimer(stationId) {
+            const station = timers[stationId];
+            const statusIndicator = document.querySelector(`#station${stationId} .status-indicator`);
+            statusIndicator.classList.remove('online');
+
+            if (station && station.running) {
+                clearInterval(station.interval);
+                station.elapsedTime = Date.now() - station.startTime;
+                station.running = false;
+                station.endClockTime = new Date();
+                document.getElementById(`endTime${stationId}`).innerText = formatTime(station.endClockTime);
+            }
+        }
+
+       // تابع بروزرسانی نمایشگر تایمر و هزینه
+        function updateTimer(stationId) {
+            const station = timers[stationId];
+            const timeDisplay = document.getElementById(`timeDisplay${stationId}`);
+            const totalCostDisplay = document.getElementById(`totalCost${stationId}`);
+            
+            // This line was the main culprit. It should be based on the actual start time.
+            // If the timer is running, calculate elapsed time from 'startTime' to 'now'.
+            // If paused, use the stored 'elapsedTime'.
+            const currentElapsed = station.running ? (Date.now() - station.startTime) : station.elapsedTime;
+            station.elapsedTime = currentElapsed; // Update elapsedTime in the station object
+
+            const totalSeconds = Math.floor(currentElapsed / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            timeDisplay.innerHTML = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+
+            const gameDurationMinutes = Math.max(0, totalSeconds / 60);
+            const gameCost = gameDurationMinutes * MINUTE_RATE;
+            const roundedGameCost = Math.round(gameCost / 1000) * 1000;
+
+            const bistroTotal = station.bistroItems.reduce((sum, item) => sum + item.price, 0);
+
+            station.currentGameCost = roundedGameCost; // ذخیره هزینه بازی
+            station.currentBistroCost = bistroTotal;   // ذخیره هزینه بوفه
+
+            const totalCost = roundedGameCost + bistroTotal;
+            station.currentTotalCost = totalCost;
+            totalCostDisplay.innerHTML = `هزینه کل: ${formatCurrency(totalCost)}`;
+        }
+
+        // تابع تسویه حساب ایستگاه
+        async function checkoutStation(stationId) {
+            const station = timers[stationId];
+
+            if (!station || (station.elapsedTime === 0 && station.bistroItems.length === 0)) {
+                await showAlert('توجه', 'این ایستگاه فعلاً استفاده نشده یا هزینه ای ندارد.');
+                return;
+            }
+
+            if (station.running) {
+                pauseTimer(stationId);
+            }
+
+            const finalCost = station.currentTotalCost || 0;
+            const finalGameCost = station.currentGameCost || 0;
+            const finalBistroCost = station.currentBistroCost || 0;
+
+
+            const confirmCheckout = await showConfirm(`تسویه حساب ایستگاه ${stationId} با مبلغ ${formatCurrency(finalCost)}؟`);
+
+            if (confirmCheckout) {
+                currentDailyRevenue += finalCost;
+                dailyGameRevenue += finalGameCost;
+                dailyBistroRevenue += finalBistroCost;
+
+                document.getElementById('dailyRevenue').innerText = formatCurrency(currentDailyRevenue);
+
+                resetStation(stationId);
+                await showAlert('موفق', `ایستگاه ${stationId} تسویه شد. مبلغ ${formatCurrency(finalCost)} به درآمد امروز اضافه شد.`);
+            }
+            saveRevenueData();
+        }
+
+        // تابع ریست کامل ایستگاه (بعد از تسویه)
+        function resetStation(stationId) {
+            const station = timers[stationId];
+            const timeDisplay = document.getElementById(`timeDisplay${stationId}`);
+            const totalCostDisplay = document = document.getElementById(`totalCost${stationId}`);
+            const bistroItemsContainer = document.getElementById(`bistroItems${stationId}`);
+            const bistroTotalDisplay = document.getElementById(`bistroTotal${stationId}`);
+            const statusIndicator = document.querySelector(`#station${stationId} .status-indicator`);
+            const startTimeDisplay = document.getElementById(`startTime${stationId}`);
+            const endTimeDisplay = document.getElementById(`endTime${stationId}`);
+
+            statusIndicator.classList.remove('online');
+
+            if (station) {
+                clearInterval(station.interval);
+                timers[stationId] = {
+                    startTime: 0,
+                    elapsedTime: 0,
+                    interval: null,
+                    running: false,
+                    bistroItems: [],
+                    startClockTime: null,
+                    endClockTime: null,
+                    currentTotalCost: 0,
+                    currentGameCost: 0,
+                    currentBistroCost: 0
+                };
+            }
+
+            timeDisplay.innerHTML = '00:00:00'; // Reset time display
+            startTimeDisplay.innerHTML = '--:--';
+            endTimeDisplay.innerHTML = '--:--';
+            totalCostDisplay.innerHTML = 'هزینه کل: 0 تومان';
+            bistroItemsContainer.innerHTML = '';
+            bistroTotalDisplay.innerHTML = '0 تومان';
+        }
+
+        // مدیریت مودال بوفه
+        let currentStationForBistro = null;
+
+        function openBistroModal(stationId) {
+            currentStationForBistro = stationId;
+            const modal = document.getElementById('bistroModal');
+            const modalBistroItemsContainer = document.getElementById('modalBistroItems');
+            modalBistroItemsContainer.innerHTML = '';
+
+            BISTRO_ITEMS.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('modal-item');
+                itemDiv.innerHTML = `
+                    <span>${item.name} (${formatCurrency(item.price)})</span>
+                    <button onclick="addSelectedBistroItem(${item.id})">افزودن</button>
+                `;
+                modalBistroItemsContainer.appendChild(itemDiv);
+            });
+            modal.style.display = 'flex';
+        }
+
+        function closeBistroModal() {
+            document.getElementById('bistroModal').style.display = 'none';
+            currentStationForBistro = null;
+        }
+
+        function addSelectedBistroItem(itemId) {
+            const selectedItem = BISTRO_ITEMS.find(item => item.id === itemId);
+            if (selectedItem && currentStationForBistro !== null) {
+                const station = timers[currentStationForBistro];
+                if (station) {
+                    station.bistroItems.push(selectedItem);
+                    renderBistroItems(currentStationForBistro);
+                    updateTimer(currentStationForBistro);
+                }
+            }
+            closeBistroModal();
+        }
+
+        function addBistroItemPrompt(stationId) {
+            openBistroModal(stationId);
+        }
+
+        function removeBistroItem(stationId, itemIndex) {
+            const station = timers[stationId];
+            if (station && station.bistroItems.length > itemIndex) {
+                station.bistroItems.splice(itemIndex, 1);
+                renderBistroItems(stationId);
+                updateTimer(stationId);
+            }
+        }
+
+        function renderBistroItems(stationId) {
+            const station = timers[stationId];
+            const bistroItemsContainer = document.getElementById(`bistroItems${stationId}`);
+            const bistroTotalDisplay = document.getElementById(`bistroTotal${stationId}`);
+
+            bistroItemsContainer.innerHTML = '';
+
+            let currentBistroTotal = 0;
+            station.bistroItems.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('bistro-item');
+                itemDiv.innerHTML = `
+                    <span>${item.name} (${formatCurrency(item.price)})</span>
+                    <button onclick="removeBistroItem(${stationId}, ${index})">حذف</button>
+                `;
+                bistroItemsContainer.appendChild(itemDiv);
+                currentBistroTotal += item.price;
+            });
+            bistroTotalDisplay.innerHTML = formatCurrency(currentBistroTotal);
+        }
+
+        // تابع نمایش جزئیات پایان روز کاری (مودال جدید)
+        async function showEndDayDetails() {
+            closeBistroModal(); // مطمئن شوید مودال بوفه بسته است
+            // closeAlertModal(); // No need to close alert modal here, as it might be open for confirmation
+
+            const modal = document.getElementById('endDayDetailsModal');
+            const pastDaysList = document.getElementById('pastDaysRevenueList');
+            pastDaysList.innerHTML = ''; // Clear previous list
+
+            if (pastWorkDays.length === 0) {
+                pastDaysList.innerHTML = '<p style="text-align: center; color: #ccc;">هیچ روز کاری گذشته‌ای ثبت نشده است.</p>';
+            } else {
+                // Display in reverse order (newest first)
+                for (let i = pastWorkDays.length - 1; i >= 0; i--) {
+                    const day = pastWorkDays[i];
+                    const dayEntry = document.createElement('div');
+                    dayEntry.classList.add('day-entry');
+                    dayEntry.innerHTML = `
+                        <h3>
+                            <span>${day.date}</span>
+                            <button class="delete-day-button" onclick="deletePastDay(${i})">حذف</button>
+                        </h3>
+                        <p>درآمد بوفه: ${formatCurrency(day.bistroRevenue)}</p>
+                        <p>درآمد میز بازی: ${formatCurrency(day.gameRevenue)}</p>
+                        <p class="total">درآمد کل: ${formatCurrency(day.totalRevenue)}</p>
+                    `;
+                    pastDaysList.appendChild(dayEntry); // Append, since we are iterating in reverse
+                }
+            }
+            modal.style.display = 'flex';
+        }
+
+        function closeEndDayDetailsModal() {
+            document.getElementById('endDayDetailsModal').style.display = 'none';
+        }
+
+        // تابع تایید پایان روز کاری (کلیک روی دکمه در مودال پایان روز)
+        async function confirmEndWorkDay() {
+            const activeStations = Object.values(timers).filter(s => s.running || s.elapsedTime > 0 || s.bistroItems.length > 0);
+            if (activeStations.length > 0) {
+                await showAlert('هشدار', 'لطفاً ابتدا تمام ایستگاه‌های فعال را تسویه حساب کنید.');
+                return;
+            }
+
+            const today = new Date();
+            // Using Intl.DateTimeFormat for Persian date and weekday
+            const dateString = formatPersianDate(today);
+
+            const confirmEnd = await showConfirm(`آیا مطمئنید که می‌خواهید روز کاری را با درآمد ${formatCurrency(currentDailyRevenue)} به پایان برسانید؟`);
+
+            if (confirmEnd) {
+                const daySummary = {
+                    date: dateString, // Formatted Persian date with weekday
+                    totalRevenue: currentDailyRevenue,
+                    bistroRevenue: dailyBistroRevenue,
+                    gameRevenue: dailyGameRevenue
+                };
+                pastWorkDays.push(daySummary); // Add to the list of past days
+
+                // Reset for a new day
+                currentDailyRevenue = 0;
+                dailyBistroRevenue = 0;
+                dailyGameRevenue = 0;
+                document.getElementById('dailyRevenue').innerText = formatCurrency(currentDailyRevenue); // Update display
+
+                saveRevenueData(); // Save updated data
+                await showAlert('موفق', 'روز کاری با موفقیت به پایان رسید و درآمد ثبت شد. سیستم برای شروع روز جدید آماده است.');
+                showEndDayDetails(); // Re-render the modal to show the newly added day and updated list
+            }
+        }
+
+        // تابع حذف یک روز کاری از لیست
+        async function deletePastDay(index) {
+            const confirmDelete = await showConfirm('آیا مطمئنید که می‌خواهید این روز کاری را حذف کنید؟ این عمل برگشت‌ناپذیر است.');
+            if (confirmDelete) {
+                // We're iterating in reverse in showEndDayDetails, so the index `i` passed is the actual index in `pastWorkDays`.
+                pastWorkDays.splice(index, 1); // Remove the item at the given index
+                saveRevenueData(); // Save updated data
+                showEndDayDetails(); // Re-render the list
+                await showAlert('حذف شد', 'روز کاری با موفقیت حذف شد.');
+            }
+        }
+
+
+        // Modal Alert/Confirm Functions
+        function showAlert(title, message) {
+            return new Promise(resolve => {
+                const modal = document.getElementById('alertModal');
+                document.getElementById('alertTitle').innerText = title;
+                document.getElementById('alertMessage').innerText = message;
+                document.getElementById('alertConfirmBtn').style.display = 'none';
+                document.getElementById('alertCancelBtn').style.display = 'none';
+                document.getElementById('alertOKBtn').style.display = 'inline-block';
+
+                modal.style.display = 'flex';
+                resolveAlertPromise = resolve;
+
+                // Close other modals if open
+                closeBistroModal();
+                closeEndDayDetailsModal();
+
+
+                document.getElementById('alertOKBtn').onclick = () => {
+                    closeAlertModal();
+                    resolveAlertPromise(true);
+                };
+            });
+        }
+
+        function showConfirm(message) {
+            return new Promise(resolve => {
+                const modal = document.getElementById('alertModal');
+                document.getElementById('alertTitle').innerText = 'تایید'; // Fixed title for confirm
+                document.getElementById('alertMessage').innerText = message;
+                document.getElementById('alertConfirmBtn').style.display = 'inline-block';
+                document.getElementById('alertCancelBtn').style.display = 'inline-block';
+                document.getElementById('alertOKBtn').style.display = 'none';
+
+                modal.style.display = 'flex';
+                resolveAlertPromise = resolve;
+
+                // Close other modals if open
+                closeBistroModal();
+                closeEndDayDetailsModal();
+
+
+                document.getElementById('alertConfirmBtn').onclick = () => {
+                    closeAlertModal();
+                    resolveAlertPromise(true);
+                };
+                document.getElementById('alertCancelBtn').onclick = () => {
+                    closeAlertModal();
+                    resolveAlertPromise(false);
+                };
+            });
+        }
+
+        function closeAlertModal() {
+            document.getElementById('alertModal').style.display = 'none';
+        }
+
+        // LocalStorage functions for persisting data
+        function saveRevenueData() {
+            localStorage.setItem('currentDailyRevenue', currentDailyRevenue.toString());
+            localStorage.setItem('dailyBistroRevenue', dailyBistroRevenue.toString());
+            localStorage.setItem('dailyGameRevenue', dailyGameRevenue.toString());
+            localStorage.setItem('pastWorkDays', JSON.stringify(pastWorkDays)); // Save as JSON string
+        }
+
+        function loadRevenueData() {
+            const storedDailyRevenue = localStorage.getItem('currentDailyRevenue');
+            if (storedDailyRevenue) {
+                currentDailyRevenue = parseInt(storedDailyRevenue);
+            } else {
+                currentDailyRevenue = 0; // Ensure it's 0 if not found
+            }
+
+            const storedBistroRevenue = localStorage.getItem('dailyBistroRevenue');
+            if (storedBistroRevenue) {
+                dailyBistroRevenue = parseInt(storedBistroRevenue);
+            } else {
+                dailyBistroRevenue = 0;
+            }
+
+            const storedGameRevenue = localStorage.getItem('dailyGameRevenue');
+            if (storedGameRevenue) {
+                dailyGameRevenue = parseInt(storedGameRevenue);
+            } else {
+                dailyGameRevenue = 0;
+            }
+
+            const storedPastWorkDays = localStorage.getItem('pastWorkDays');
+            if (storedPastWorkDays) {
+                try {
+                    pastWorkDays = JSON.parse(storedPastWorkDays); // Corrected variable name
+                } catch (e) {
+                    console.error("Error parsing pastWorkDays from localStorage:", e);
+                    pastWorkDays = []; // Reset if corrupted
+                }
+            }
+            // Ensure dailyRevenue display is updated even if no data was loaded
+            document.getElementById('dailyRevenue').innerText = formatCurrency(currentDailyRevenue);
+        }
+
+        // مقداردهی اولیه برای همه ایستگاه‌ها و بارگذاری درآمد ذخیره شده
+        document.addEventListener('DOMContentLoaded', () => {
+            const numStations = 5;
+            for (let i = 1; i <= numStations; i++) {
+                timers[i] = {
+                    startTime: 0,
+                    elapsedTime: 0,
+                    interval: null,
+                    running: false,
+                    bistroItems: [],
+                    startClockTime: null,
+                    endClockTime: null,
+                    currentTotalCost: 0,
+                    currentGameCost: 0,
+                    currentBistroCost: 0
+                };
+                // Initial update to ensure 00:00:00 is displayed
+                updateTimer(i);
+            }
+            loadRevenueData();
+
+            // ذخیره درآمد در LocalStorage هر 10 ثانیه یکبار
+            setInterval(saveRevenueData, 10000);
+        });
+
+    </script>
+</body>
+</html>
